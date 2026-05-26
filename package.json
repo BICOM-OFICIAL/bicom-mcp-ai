@@ -1,0 +1,61 @@
+{
+  "name": "@bicom-oficial/bicom-mcp-ai",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for the BICOM Chilean ERP — sales, AR, stock, customers, purchases stats over Claude Desktop.",
+  "type": "module",
+  "license": "MIT",
+  "author": "BICOM-OFICIAL",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BICOM-OFICIAL/bicom-mcp-ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BICOM-OFICIAL/bicom-mcp-ai/issues"
+  },
+  "homepage": "https://github.com/BICOM-OFICIAL/bicom-mcp-ai#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bicom",
+    "erp",
+    "chile",
+    "claude",
+    "ai",
+    "stats"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "bin": {
+    "bicom-mcp-ai": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src",
+    "format": "biome format --write src",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^22.7.0",
+    "msw": "^2.6.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "packageManager": "pnpm@9.12.0"
+}

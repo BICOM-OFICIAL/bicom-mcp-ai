@@ -1,0 +1,25 @@
+# Source — solo se publica dist/
+src/
+tests/
+
+# Configs de dev
+*.config.ts
+tsconfig.json
+biome.json
+vitest.config.ts
+tsup.config.ts
+
+# Dev artifacts
+.github/
+.vscode/
+.idea/
+coverage/
+.pnpm-store/
+
+# Lock + tooling
+pnpm-lock.yaml
+.npmrc
+
+# Misc
+*.log
+.DS_Store
