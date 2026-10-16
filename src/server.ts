@@ -1,5 +1,5 @@
 // MCP server factory. Crea un McpServer, instancia el BicomApiClient con la
-// config del entorno y registra los 8 tools.
+// config del entorno y registra los tools.
 //
 // El transport (STDIO V1, SSE V2) lo aplica el caller — index.ts para el
 // CLI, los tests para in-memory.
@@ -28,7 +28,7 @@ export function createServer(config: Config): McpServer {
   );
 
   const api = new BicomApiClient(config.baseUrl, config.token);
-  registerAllTools(server, api);
+  registerAllTools(server, api, config);
 
   return server;
 }

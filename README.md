@@ -34,7 +34,7 @@ Eso es lo que recibirás en Claude Desktop al conectar el MCP. Sigue leyendo par
 
 ## Qué puedes preguntar
 
-8 herramientas conectadas a la base de datos de tu empresa en BICOM:
+12 herramientas conectadas a la base de datos de tu empresa en BICOM:
 
 | Categoría | Ejemplos |
 |---|---|
@@ -43,8 +43,27 @@ Eso es lo que recibirás en Claude Desktop al conectar el MCP. Sigue leyendo par
 | 📒 **Cobranza** | "¿Cuánto me deben en total?", "¿Qué clientes deben hace más de 60 días?" |
 | 📦 **Stock** | "¿Qué productos están por agotarse?", "Productos con stock en 0" |
 | 🛒 **Compras** | "¿Cuánto gasté en compras este año?", "Compara compras vs ventas del mes" |
+| 🧾 **Cotizaciones** | "Cotiza 10 cajas de guantes nitrilo y 5 alcohol gel a Acme SpA, RUT 76.123.456-7, con 10% de descuento en los guantes" |
 
 **Períodos disponibles**: hoy, ayer, esta semana, este mes, mes pasado, trimestre actual, año actual. Todos con comparativo automático contra el período anterior.
+
+### 🧾 Cotizaciones
+
+El asistente busca los productos (`search_products`), te muestra el resumen y, **solo cuando confirmas**, crea la cotización en BICOM (`create_quote`). El PDF queda guardado en `~/Downloads/Cotizaciones BICOM/` (configurable con `BICOM_QUOTES_DIR`).
+
+- El precio de cada línea sale del maestro de productos de BICOM; puedes indicar descuento por línea (% o monto).
+- Si el RUT del cliente no existe, se crea con el nombre y datos que indiques.
+- La cotización es interna: no va al SII ni mueve stock.
+- Vendedor, sucursal, bodega y giro: si tu empresa tiene uno solo de cada uno se usan automáticamente; si tiene varios, el asistente te pregunta (`get_quote_options`). Para no elegirlos cada vez, fíjalos en el `env` del MCP:
+
+```json
+"BICOM_DEFAULT_SELLER_ID": "3",
+"BICOM_DEFAULT_BRANCHOFFICE_ID": "1",
+"BICOM_DEFAULT_WAREHOUSE_ID": "1",
+"BICOM_DEFAULT_ACTIVITY_ID": "685"
+```
+
+Si la cotización se crea pero falla la generación del PDF, puedes pedir el PDF de nuevo con `get_quote_pdf`.
 
 ---
 
@@ -136,7 +155,7 @@ Si ya existe con otros MCPs configurados, agrega únicamente la entrada `"bicom"
 
 **Cierra Claude completamente** (clic derecho sobre el ícono → Quit, no solo minimizar). Vuelve a abrirlo.
 
-Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 8 herramientas listadas.
+Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 12 herramientas listadas.
 
 ### Paso 6 — Probar
 
@@ -226,7 +245,7 @@ Envía el contenido al administrador de BICOM o abre un issue en este repositori
 ## 🛡️ Seguridad
 
 - El `BICOM_API_TOKEN` se almacena **en texto plano** en `claude_desktop_config.json`. Trata ese archivo como una contraseña.
-- El MCP **solo lee datos** de tu empresa — no puede crear, modificar ni eliminar nada.
+- El MCP **solo lee datos** de tu empresa, con una excepción: `create_quote` crea cotizaciones (y el cliente, si su RUT no existe). Claude Desktop te pide aprobar cada uso de la herramienta. No puede modificar ni eliminar nada.
 - Cada token está **scopeado a tu empresa**: nunca podrás ver datos de otra empresa con tu token, ni viceversa.
 - Toda la comunicación con `bicomrest.bicomstore.cl` se realiza por **HTTPS**.
 
