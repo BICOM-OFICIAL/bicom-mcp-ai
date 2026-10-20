@@ -14,12 +14,14 @@ import { safeRender } from "./_helpers.js";
 export function registerPurchasesSummary(server: McpServer, api: BicomApiClient): void {
   server.tool(
     "get_purchases_summary",
-    "Resumen de compras del periodo (movement_purchases): cantidad de documentos recibidos, totales bruto/neto/IVA, y comparativo contra el periodo anterior. Util para 'cuanto gaste en compras este mes'.",
+    "Resumen de compras del periodo (movement_purchases): cantidad de documentos recibidos, totales bruto/neto/IVA, y comparativo contra el periodo anterior. Util para 'cuanto gaste en compras este mes'. Acepta un period fijo o un rango libre con date_from/date_to (YYYY-MM-DD).",
     purchasesSummaryInput,
-    async ({ period }) =>
+    async ({ period, date_from, date_to }) =>
       safeRender(async () => {
         const data = await api.get<PurchasesSummaryResponse>("/api/stats/purchases/summary", {
           period,
+          date_from,
+          date_to,
         });
         return render(data);
       }),

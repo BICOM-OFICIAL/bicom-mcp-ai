@@ -1,4 +1,4 @@
-// Zod input schemas + TypeScript response types for the 8 stats endpoints.
+// Zod input schemas + TypeScript response types for the 9 stats endpoints.
 //
 // Inputs are validated by the MCP SDK before reaching the handler (each tool
 // declares its zod shape). Response types are trusted (the bicom-api server
@@ -29,6 +29,20 @@ export const PeriodSchema = z
 
 export type Period = z.infer<typeof PeriodSchema>;
 
+// Rango libre (date_from/date_to, inclusivo). Si llega date_from manda sobre
+// period: la API lo resuelve asi porque period siempre viaja con su default.
+const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha en formato YYYY-MM-DD");
+
+const periodOrRange = {
+  period: PeriodSchema.optional().default("current_month"),
+  date_from: IsoDate.optional().describe(
+    "Fecha desde (YYYY-MM-DD, inclusiva) para un rango libre, por ejemplo los ultimos 90 dias. Si se envia, reemplaza a period. Rango maximo 366 dias.",
+  ),
+  date_to: IsoDate.optional().describe(
+    "Fecha hasta o de corte (YYYY-MM-DD, inclusiva, no futura). Requiere date_from. Default: hoy.",
+  ),
+};
+
 // Limit shape para tools que devuelven listas rankeadas (R4).
 const Limit = z
   .number()
@@ -49,6 +63,8 @@ export interface SalesSummaryResponse {
   gross_total: number;
   net_total: number;
   tax_total: number;
+  // Notas de credito del periodo, en positivo. Ya estan restadas de los totales.
+  credit_notes: { documents_count: number; gross_total: number; net_total: number };
   by_doc_type: SalesByDocType[];
   previous_period?: { documents_count: number; gross_total: number };
 }
@@ -73,6 +89,58 @@ export interface TopProduct {
   description: string;
   quantity_sold: number;
   revenue_total: number;
+  // Costos unitarios netos; null si no hay dato.
+  unit_cost_average: number | null;
+  unit_cost_last_purchase: number | null;
+}
+
+export type CostBasis = "average" | "last_purchase";
+export type MarginSort = "net_sales" | "margin" | "lowest_margin_pct";
+
+export interface SalesMarginResponse {
+  period: string;
+  date_from: string;
+  date_to: string;
+  cost_basis: CostBasis;
+  cost_note: string;
+  sort: MarginSort;
+  totals: MarginTotals;
+  families_count: number;
+  families: MarginFamily[];
+  products_count: number;
+  products: MarginProduct[];
+}
+
+export interface MarginTotals {
+  quantity_sold: number;
+  net_sales: number;
+  cost_of_sales: number;
+  margin: number;
+  margin_pct: number | null;
+  markup_pct: number | null;
+  // Ventas de productos sin costo conocido: no entran al margen.
+  net_sales_without_cost: number;
+  products_without_cost: number;
+}
+
+export interface MarginFamily extends MarginTotals {
+  group_id: number | null;
+  name: string;
+}
+
+export interface MarginProduct {
+  product_id: number;
+  code: string;
+  description: string;
+  group_id: number | null;
+  family_name: string;
+  quantity_sold: number;
+  net_sales: number;
+  unit_cost: number | null;
+  cost_of_sales: number | null;
+  margin: number | null;
+  margin_pct: number | null;
+  markup_pct: number | null;
 }
 
 export interface TopSellersResponse {
@@ -183,16 +251,16 @@ export interface PurchasesSummaryResponse {
 // =============================================================================
 
 export const salesSummaryInput = {
-  period: PeriodSchema.optional().default("current_month"),
+  ...periodOrRange,
 };
 
 export const topProductsInput = {
-  period: PeriodSchema.optional().default("current_month"),
+  ...periodOrRange,
   limit: Limit.optional().default(10),
 };
 
 export const topSellersInput = {
-  period: PeriodSchema.optional().default("current_month"),
+  ...periodOrRange,
   limit: Limit.optional().default(10),
 };
 
@@ -223,10 +291,33 @@ export const lowStockProductsInput = {
 };
 
 export const topCustomersInput = {
-  period: PeriodSchema.optional().default("current_month"),
+  ...periodOrRange,
   limit: Limit.optional().default(10),
 };
 
 export const purchasesSummaryInput = {
-  period: PeriodSchema.optional().default("current_month"),
+  ...periodOrRange,
+};
+
+export const salesMarginInput = {
+  ...periodOrRange,
+  limit: Limit.optional()
+    .default(20)
+    .describe(
+      "Cantidad maxima de productos a listar (1..100). Default 20. Los totales y las familias siempre cubren todo el periodo.",
+    ),
+  sort: z
+    .enum(["net_sales", "margin", "lowest_margin_pct"])
+    .optional()
+    .default("net_sales")
+    .describe(
+      "Orden de los productos: net_sales (mas vendidos, default) | margin (mas margen en pesos) | lowest_margin_pct (menor margen %, para detectar productos que dejan poco o pierden).",
+    ),
+  cost_basis: z
+    .enum(["average", "last_purchase"])
+    .optional()
+    .default("average")
+    .describe(
+      "Base del costo: average (costo promedio ponderado a la fecha hasta, default) | last_purchase (costo de la ultima compra actual del producto).",
+    ),
 };

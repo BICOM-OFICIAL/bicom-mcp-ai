@@ -14,12 +14,14 @@ import { safeRender } from "./_helpers.js";
 export function registerTopCustomers(server: McpServer, api: BicomApiClient): void {
   server.tool(
     "get_top_customers",
-    "Clientes que mas compraron en el periodo, rankeados por ingresos (revenue_total neto) DESC. Devuelve customer_id, RUT, razon social, cantidad de documentos e ingresos.",
+    "Clientes que mas compraron en el periodo, rankeados por ingresos (revenue_total neto) DESC. Devuelve customer_id, RUT, razon social, cantidad de documentos e ingresos. Las notas de credito restan. Acepta un period fijo o un rango libre con date_from/date_to (YYYY-MM-DD).",
     topCustomersInput,
-    async ({ period, limit }) =>
+    async ({ period, date_from, date_to, limit }) =>
       safeRender(async () => {
         const data = await api.get<TopCustomersResponse>("/api/stats/customers/top", {
           period,
+          date_from,
+          date_to,
           limit,
         });
         return render(data, limit ?? 10);

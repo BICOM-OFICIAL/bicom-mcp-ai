@@ -34,18 +34,19 @@ Eso es lo que recibirás en Claude Desktop al conectar el MCP. Sigue leyendo par
 
 ## Qué puedes preguntar
 
-12 herramientas conectadas a la base de datos de tu empresa en BICOM:
+13 herramientas conectadas a la base de datos de tu empresa en BICOM:
 
 | Categoría | Ejemplos |
 |---|---|
 | 💰 **Ventas** | "¿Cuánto vendí este mes?", "Top 10 productos del trimestre", "¿Cuál es mi mejor vendedor este año?" |
+| 📈 **Margen** | "¿Cuál fue mi margen por familia el último trimestre?", "¿Qué productos me dejan menos margen?" |
 | 👥 **Clientes** | "¿Quiénes son mis mejores clientes?", "Top 20 clientes del trimestre" |
 | 📒 **Cobranza** | "¿Cuánto me deben en total?", "¿Qué clientes deben hace más de 60 días?" |
 | 📦 **Stock** | "¿Qué productos están por agotarse?", "Productos con stock en 0" |
 | 🛒 **Compras** | "¿Cuánto gasté en compras este año?", "Compara compras vs ventas del mes" |
 | 🧾 **Cotizaciones** | "Cotiza 10 cajas de guantes nitrilo y 5 alcohol gel a Acme SpA, RUT 76.123.456-7, con 10% de descuento en los guantes" |
 
-**Períodos disponibles**: hoy, ayer, esta semana, este mes, mes pasado, trimestre actual, año actual. Todos con comparativo automático contra el período anterior.
+**Períodos disponibles**: hoy, ayer, esta semana, este mes, mes pasado, trimestre actual, año actual, o un rango libre de fechas de hasta un año (por ejemplo, "los últimos 90 días"). Los resúmenes traen comparativo automático contra el período anterior. Las ventas se informan netas de notas de crédito.
 
 ### 🧾 Cotizaciones
 
@@ -155,7 +156,7 @@ Si ya existe con otros MCPs configurados, agrega únicamente la entrada `"bicom"
 
 **Cierra Claude completamente** (clic derecho sobre el ícono → Quit, no solo minimizar). Vuelve a abrirlo.
 
-Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 12 herramientas listadas.
+Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 13 herramientas listadas.
 
 ### Paso 6 — Probar
 
@@ -209,6 +210,7 @@ Claude puede ejecutar múltiples herramientas en una sola consulta. Algunos ejem
 | *"¿Cómo está mi negocio?"* | Ventas + cobranza + stock bajo → health check en 60 segundos |
 | *"¿Qué clientes son top pero también me están debiendo?"* | Top customers + overdue customers, cruzados |
 | *"Compara mi rentabilidad: ventas vs compras del año"* | Sales summary + purchases summary, año actual |
+| *"¿Qué familias me dejan más margen y cuáles menos?"* | Sales margin por familia, con costo promedio a la fecha |
 
 ---
 

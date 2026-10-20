@@ -1,4 +1,4 @@
-// MCP tool: search_products -> GET /api/inventory/stock?search=&limit=
+// MCP tool: search_products -> GET /api/inventory/stock?search=&limit=&include=cost
 //
 // Paso previo a create_quote: el endpoint de cotizaciones resuelve cada linea
 // por codigo, asi que el asistente necesita encontrar el codigo exacto.
@@ -14,11 +14,15 @@ import { safeRender } from "./_helpers.js";
 export function registerSearchProducts(server: McpServer, api: BicomApiClient): void {
   server.tool(
     "search_products",
-    "Busca productos por codigo, codigo de barras o descripcion. Devuelve codigo, descripcion, precio bruto (con IVA) y stock. Usalo para obtener los codigos exactos antes de create_quote.",
+    "Busca productos por codigo, codigo de barras o descripcion. Devuelve codigo, descripcion, precio bruto (con IVA), stock y costo promedio ponderado neto a hoy (— si no hay dato). Usalo para obtener los codigos exactos antes de create_quote.",
     searchProductsInput,
     async ({ search, limit }) =>
       safeRender(async () => {
-        const data = await api.get<StockSearchResponse>("/api/inventory/stock", { search, limit });
+        const data = await api.get<StockSearchResponse>("/api/inventory/stock", {
+          search,
+          limit,
+          include: "cost",
+        });
         return render(search, data);
       }),
   );
@@ -45,6 +49,12 @@ function render(search: string, d: StockSearchResponse): string {
         align: "right",
       },
       { key: "stock", label: "Stock", format: (v) => formatInt(v as number), align: "right" },
+      {
+        key: "unit_cost_average",
+        label: "Costo prom. neto",
+        format: (v) => formatCLP(v as number),
+        align: "right",
+      },
     ]),
   );
   return lines.join("\n");

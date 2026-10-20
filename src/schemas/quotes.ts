@@ -21,6 +21,8 @@ export interface ProductStock {
   price_brute: number;
   stock: number;
   is_active: number;
+  // Costo promedio ponderado a hoy (solo con include=cost); null si no hay dato.
+  unit_cost_average?: number | null;
 }
 
 export interface StockSearchResponse {

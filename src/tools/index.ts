@@ -1,4 +1,4 @@
-// Tools registry — registra los tools del MCP en el server: 8 de stats
+// Tools registry — registra los tools del MCP en el server: 9 de stats
 // (solo lectura) + 4 de cotizaciones (busqueda, opciones, crear, PDF).
 //
 // Spec ref: sdd/bicom-mcp-v1/spec R5-R12.
@@ -14,6 +14,7 @@ import { registerLowStockProducts } from "./low-stock-products.js";
 import { registerOverdueCustomers } from "./overdue-customers.js";
 import { registerPurchasesSummary } from "./purchases-summary.js";
 import { registerQuoteOptions } from "./quote-options.js";
+import { registerSalesMargin } from "./sales-margin.js";
 import { registerSalesSummary } from "./sales-summary.js";
 import { registerSearchProducts } from "./search-products.js";
 import { registerTopCustomers } from "./top-customers.js";
@@ -24,6 +25,7 @@ export function registerAllTools(server: McpServer, api: BicomApiClient, config:
   registerSalesSummary(server, api);
   registerTopProducts(server, api);
   registerTopSellers(server, api);
+  registerSalesMargin(server, api);
   registerAccountsReceivable(server, api);
   registerOverdueCustomers(server, api);
   registerLowStockProducts(server, api);

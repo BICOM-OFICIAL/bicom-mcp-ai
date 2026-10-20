@@ -14,11 +14,15 @@ import { safeRender } from "./_helpers.js";
 export function registerSalesSummary(server: McpServer, api: BicomApiClient): void {
   server.tool(
     "get_sales_summary",
-    "Resumen de ventas del periodo: cantidad de documentos emitidos, totales bruto/neto/IVA, desglose por tipo de documento (boleta afecta 39, boleta exenta 41, factura afecta 33, factura exenta 34, guia 52, NC 61, ND 56) y comparativo contra el periodo anterior. Solo cuenta documentos aceptados por SII (is_sii=1).",
+    "Resumen de ventas del periodo: cantidad de documentos emitidos, totales bruto/neto/IVA NETOS de notas de credito (las NC restan), el total de NC aparte, desglose por tipo de documento (boleta afecta 39, boleta exenta 41, factura afecta 33, factura exenta 34, NC 61, ND 56) y comparativo contra el periodo anterior. Las guias de despacho (52) no cuentan como venta. Solo cuenta documentos aceptados por SII (is_sii=1). Acepta un period fijo o un rango libre con date_from/date_to (YYYY-MM-DD).",
     salesSummaryInput,
-    async ({ period }) =>
+    async ({ period, date_from, date_to }) =>
       safeRender(async () => {
-        const data = await api.get<SalesSummaryResponse>("/api/stats/sales/summary", { period });
+        const data = await api.get<SalesSummaryResponse>("/api/stats/sales/summary", {
+          period,
+          date_from,
+          date_to,
+        });
         return render(data);
       }),
   );
@@ -33,6 +37,12 @@ function render(d: SalesSummaryResponse): string {
   lines.push(`- **Total bruto:** ${formatCLP(d.gross_total)}`);
   lines.push(`- **Total neto:** ${formatCLP(d.net_total)}`);
   lines.push(`- **IVA:** ${formatCLP(d.tax_total)}`);
+  const nc = d.credit_notes;
+  if (nc && nc.documents_count > 0) {
+    lines.push(
+      `- **Notas de credito (ya restadas):** ${formatInt(nc.documents_count)} docs, ${formatCLP(nc.gross_total)} bruto / ${formatCLP(nc.net_total)} neto`,
+    );
+  }
 
   if (d.previous_period) {
     const prev = d.previous_period;
