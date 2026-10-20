@@ -34,7 +34,7 @@ Eso es lo que recibirás en Claude Desktop al conectar el MCP. Sigue leyendo par
 
 ## Qué puedes preguntar
 
-13 herramientas conectadas a la base de datos de tu empresa en BICOM:
+14 herramientas conectadas a la base de datos de tu empresa en BICOM:
 
 | Categoría | Ejemplos |
 |---|---|
@@ -42,7 +42,7 @@ Eso es lo que recibirás en Claude Desktop al conectar el MCP. Sigue leyendo par
 | 📈 **Margen** | "¿Cuál fue mi margen por familia el último trimestre?", "¿Qué productos me dejan menos margen?" |
 | 👥 **Clientes** | "¿Quiénes son mis mejores clientes?", "Top 20 clientes del trimestre" |
 | 📒 **Cobranza** | "¿Cuánto me deben en total?", "¿Qué clientes deben hace más de 60 días?" |
-| 📦 **Stock** | "¿Qué productos están por agotarse?", "Productos con stock en 0" |
+| 📦 **Stock** | "¿Cuánto stock hay del 11360 en cada bodega?", "¿Qué productos están por agotarse?" |
 | 🛒 **Compras** | "¿Cuánto gasté en compras este año?", "Compara compras vs ventas del mes" |
 | 🧾 **Cotizaciones** | "Cotiza 10 cajas de guantes nitrilo y 5 alcohol gel a Acme SpA, RUT 76.123.456-7, con 10% de descuento en los guantes" |
 
@@ -156,7 +156,7 @@ Si ya existe con otros MCPs configurados, agrega únicamente la entrada `"bicom"
 
 **Cierra Claude completamente** (clic derecho sobre el ícono → Quit, no solo minimizar). Vuelve a abrirlo.
 
-Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 13 herramientas listadas.
+Al volver a abrirse, verás un ícono de herramientas en la barra de input. Al hacer clic debería aparecer **bicom** con sus 14 herramientas listadas.
 
 ### Paso 6 — Probar
 

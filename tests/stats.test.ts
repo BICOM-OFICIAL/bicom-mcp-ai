@@ -5,6 +5,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { BicomApiClient } from "../src/client/bicom-api.js";
 import type { SalesMarginResponse } from "../src/schemas/stats.js";
+import { registerProductStock } from "../src/tools/product-stock.js";
 import { registerSalesMargin } from "../src/tools/sales-margin.js";
 import { registerSalesSummary } from "../src/tools/sales-summary.js";
 import { registerSearchProducts } from "../src/tools/search-products.js";
@@ -118,6 +119,23 @@ const BODIES: Record<string, unknown> = {
     limit: 10,
     offset: 0,
   },
+  "/api/inventory/stock/1": {
+    data: [
+      { warehouse_id: 1, warehouse_name: "Bodega Principal", stock: 12 },
+      { warehouse_id: 3, warehouse_name: "Bodega Central Quilpue", stock: 9.5 },
+    ],
+  },
+};
+
+// Busqueda con varios candidatos y sin codigo exacto.
+const CARCASAS = {
+  data: [
+    { product_id: 7, code: "11360", description: "Carcasa 360 iPhone 11", stock: 21 },
+    { product_id: 8, code: "11361", description: "Carcasa 360 iPhone 11 Pro", stock: 4 },
+  ],
+  total: 2,
+  limit: 10,
+  offset: 0,
 };
 
 let http: Server;
@@ -128,7 +146,13 @@ beforeAll(async () => {
   http = createHttpServer((req, res) => {
     const url = new URL(req.url ?? "/", "http://x");
     seen.push(url);
-    const body = BODIES[url.pathname];
+    const search = url.searchParams.get("search");
+    const body =
+      search === "carcasa"
+        ? CARCASAS
+        : search === "nada"
+          ? { data: [], total: 0, limit: 10, offset: 0 }
+          : BODIES[url.pathname];
     res.statusCode = body ? 200 : 404;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify(body ?? {}));
@@ -144,6 +168,7 @@ beforeAll(async () => {
   registerTopProducts(server, api);
   registerSalesMargin(server, api);
   registerSearchProducts(server, api);
+  registerProductStock(server, api);
   const [a, b] = InMemoryTransport.createLinkedPair();
   await server.connect(a);
   client = new Client({ name: "test-client", version: "0.0.0" });
@@ -234,5 +259,27 @@ describe("stats tools", () => {
     expect(q.get("sort")).toBe("net_sales");
     expect(q.get("cost_basis")).toBe("average");
     expect(q.get("limit")).toBe("20");
+  });
+});
+
+describe("get_product_stock", () => {
+  it("resolves the code and shows stock per warehouse", async () => {
+    const out = await call("get_product_stock", { code: "t1" });
+    expect(seen.map((u) => u.pathname)).toEqual(["/api/inventory/stock", "/api/inventory/stock/1"]);
+    expect(out).toContain("Stock por bodega: Tornillo (T1)");
+    expect(out).toContain("| Bodega Central Quilpue | 9,5 |");
+    expect(out).toContain("**Total:** 21,5");
+  });
+
+  it("lists candidates when the code is not exact", async () => {
+    const out = await call("get_product_stock", { code: "carcasa" });
+    expect(seen).toHaveLength(1);
+    expect(out).toContain("Hay varios productos");
+    expect(out).toContain("| 11361 | Carcasa 360 iPhone 11 Pro | 4 |");
+  });
+
+  it("says so when nothing matches", async () => {
+    const out = await call("get_product_stock", { code: "nada" });
+    expect(out).toContain("No se encontro ningun producto");
   });
 });

@@ -32,6 +32,17 @@ export interface StockSearchResponse {
   offset: number;
 }
 
+// GET /api/inventory/stock/:id — stock por bodega (solo bodegas con stock != 0).
+export interface WarehouseStock {
+  warehouse_id: number;
+  warehouse_name: string;
+  stock: number;
+}
+
+export interface WarehouseStockResponse {
+  data: WarehouseStock[] | null;
+}
+
 export interface QuoteOption {
   id: number;
   name: string;
@@ -136,4 +147,13 @@ export const createQuoteInput = {
 
 export const getQuotePdfInput = {
   quote_id: z.number().int().positive().describe("Id interno de la cotizacion (no el folio)."),
+};
+
+export const productStockInput = {
+  code: z
+    .string()
+    .min(1)
+    .describe(
+      "Codigo exacto del producto (o texto para buscarlo). Si hay varios candidatos se listan para elegir.",
+    ),
 };
