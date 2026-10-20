@@ -14,7 +14,7 @@ import { safeRender } from "./_helpers.js";
 export function registerLowStockProducts(server: McpServer, api: BicomApiClient): void {
   server.tool(
     "get_low_stock_products",
-    "Productos con stock por agotarse (stock_current <= threshold), ordenados ASC (mas bajos primero). Devuelve product_id, code, descripcion, bodega y stock actual. Default threshold=10.",
+    "Productos con stock por agotarse: cada par producto + bodega con stock actual <= threshold, ordenados ASC (mas bajos primero; el stock negativo aparece primero). Solo productos activos e inventariables. Devuelve product_id, code, descripcion, bodega y stock actual. Default threshold=10. Para el stock de un producto en todas sus bodegas usa get_product_stock.",
     lowStockProductsInput,
     async ({ threshold, limit }) =>
       safeRender(async () => {

@@ -34,6 +34,12 @@ export async function safeRender(produceText: () => Promise<string>): Promise<To
             "_Esta empresa no usa el modulo de tesoreria nuevo. Las herramientas de ventas, stock, productos, clientes y compras siguen funcionando._",
           );
           break;
+        case "STOCK_SNAPSHOT_UNAVAILABLE":
+          lines.push("");
+          lines.push(
+            "_Esta empresa aun no tiene el cierre mensual de stock. get_product_stock y search_products siguen funcionando._",
+          );
+          break;
         case "TIMEOUT":
         case "SERVICE_UNAVAILABLE":
           lines.push("");
